@@ -66,9 +66,9 @@ func (s *Scheduler) mergeMiddlewares() {
 }
 
 func (s *Scheduler) Stop() error {
+	s.isRunning = false
 	s.wg.Wait()
 	s.cron.Stop()
-	s.isRunning = false
 
 	return nil
 }
@@ -83,15 +83,17 @@ type jobWrapper struct {
 }
 
 func (w *jobWrapper) Run() {
-	w.s.wg.Add(1)
-	defer w.s.wg.Done()
+	if w.s.IsRunning() {
+		w.s.wg.Add(1)
+		defer w.s.wg.Done()
 
-	e := NewExecution()
-	ctx := NewContext(w.s, w.j, e)
+		e := NewExecution()
+		ctx := NewContext(w.s, w.j, e)
 
-	w.start(ctx)
-	err := ctx.Next()
-	w.stop(ctx, err)
+		w.start(ctx)
+		err := ctx.Next()
+		w.stop(ctx, err)
+	}
 }
 
 func (w *jobWrapper) start(ctx *Context) {
