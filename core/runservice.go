@@ -14,12 +14,13 @@ import (
 
 type RunServiceJob struct {
 	BareJob
-	Client  *docker.Client `json:"-"`
-	User    string         `default:"root"`
-	TTY     bool           `default:"false"`
-	Delete  bool           `default:"true"`
-	Image   string
-	Network string
+	Client   *docker.Client `json:"-"`
+	User     string         `default:"root"`
+	TTY      bool           `default:"false"`
+	Delete   bool           `default:"true"`
+	Image    string
+	Network  string
+	Registry string			`default:""`
 }
 
 func NewRunServiceJob(c *docker.Client) *RunServiceJob {
@@ -47,9 +48,9 @@ func (j *RunServiceJob) Run(ctx *Context) error {
 }
 
 func (j *RunServiceJob) pullImage() error {
-	o, a := buildPullOptions(j.Image)
+	o, a := buildPullOptions(j.Image, j.Registry)
 	if err := j.Client.PullImage(o, a); err != nil {
-		return fmt.Errorf("error pulling image %q: %s", j.Image, err)
+		return fmt.Errorf("error pulling image %q: %s", fullImageName(j.Registry, j.Image), err)
 	}
 
 	return nil
@@ -64,7 +65,7 @@ func (j *RunServiceJob) buildService() (*swarm.Service, error) {
 
 	createSvcOpts.ServiceSpec.TaskTemplate.ContainerSpec =
 		&swarm.ContainerSpec{
-			Image: j.Image,
+			Image: fullImageName(j.Registry, j.Image),
 		}
 
 	// Make the service run once and not restart

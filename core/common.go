@@ -216,23 +216,19 @@ func randomID() string {
 	return fmt.Sprintf("%x", b)
 }
 
-func buildPullOptions(image string) (docker.PullImageOptions, docker.AuthConfiguration) {
+func buildPullOptions(image string, registry string) (docker.PullImageOptions, docker.AuthConfiguration) {
 	tag := "latest"
-	registry := ""
+	name := image
 
 	parts := strings.Split(image, ":")
+
 	if len(parts) == 2 {
 		tag = parts[1]
-	}
-
-	name := parts[0]
-	parts = strings.Split(name, "/")
-	if len(parts) > 2 {
-		registry = parts[0]
+		name = parts[0]
 	}
 
 	return docker.PullImageOptions{
-		Repository: name,
+		Repository: fullImageName(registry, name),
 		Registry:   registry,
 		Tag:        tag,
 	}, buildAuthConfiguration(registry)
@@ -246,4 +242,12 @@ func buildAuthConfiguration(registry string) docker.AuthConfiguration {
 
 	auth, _ = dockercfg.Configs[registry]
 	return auth
+}
+
+func fullImageName(registry string, image string) (string) {
+	if registry == "" {
+		return image
+	}
+
+	return fmt.Sprintf("%s/%s", registry, image)
 }

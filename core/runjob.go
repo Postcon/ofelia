@@ -23,6 +23,7 @@ type RunJob struct {
 	Image     string
 	Network   string
 	Container string
+	Registry  string		 `default:""`
 }
 
 func NewRunJob(c *docker.Client) *RunJob {
@@ -63,7 +64,7 @@ func (j *RunJob) Run(ctx *Context) error {
 }
 
 func (j *RunJob) pullImage() error {
-	o, a := buildPullOptions(j.Image)
+	o, a := buildPullOptions(j.Image, j.Registry)
 	if err := j.Client.PullImage(o, a); err != nil {
 		return fmt.Errorf("error pulling image %q: %s", j.Image, err)
 	}
@@ -74,7 +75,7 @@ func (j *RunJob) pullImage() error {
 func (j *RunJob) buildContainer() (*docker.Container, error) {
 	c, err := j.Client.CreateContainer(docker.CreateContainerOptions{
 		Config: &docker.Config{
-			Image:        j.Image,
+			Image:        fullImageName(j.Registry, j.Image),
 			AttachStdin:  false,
 			AttachStdout: true,
 			AttachStderr: true,

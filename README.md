@@ -47,6 +47,13 @@ schedule = 0,20,40 * * * *
 image = ubuntu
 network = swarm_network
 command =  touch /tmp/example
+
+[job-service-run "service-executed-on-new-container_with_image_from_own_registry"]
+schedule = 0 0,20,40 * * * *
+registry = docker-registry.company.de:5000
+image = ubuntu
+network = swarm_network
+command =  touch /tmp/example
 ```
 
 ### Logging
