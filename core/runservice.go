@@ -63,6 +63,8 @@ func (j *RunServiceJob) buildService() (*swarm.Service, error) {
 	max := uint64(1)
 	createSvcOpts := docker.CreateServiceOptions{}
 
+	createSvcOpts.ServiceSpec.Annotations.Name = fmt.Sprintf("%s_%d", j.Name, time.Now().Unix())
+
 	createSvcOpts.ServiceSpec.TaskTemplate.ContainerSpec =
 		&swarm.ContainerSpec{
 			Image: fullImageName(j.Registry, j.Image),
