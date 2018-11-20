@@ -144,7 +144,14 @@ func (j *RunServiceJob) watchContainer(ctx *Context, svcID string) error {
 	wg.Wait()
 
 	ctx.Logger.Noticef("Service ID %s (%s) has completed\n", svcID, j.Name)
-	return err
+
+	switch exitCode {
+	case 0:
+		return nil
+	default:
+		ctx.Logger.Errorf("Service ID %s (%s) error non-zero exit code: %d", svcID, j.Name, exitCode)
+		return nil
+	}
 }
 
 func (j *RunServiceJob) findTaskStatus(ctx *Context, svcID string) (int, bool) {
