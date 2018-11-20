@@ -2,25 +2,25 @@ package core
 
 import (
 	"fmt"
+	"github.com/docker/docker/api/types/swarm"
+	"github.com/fsouza/go-dockerclient"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/docker/docker/api/types/swarm"
-	"github.com/fsouza/go-dockerclient"
 )
 
 // Note: The ServiceJob is loosely inspired by https://github.com/alexellis/jaas/
 
 type RunServiceJob struct {
 	BareJob
-	Client   *docker.Client `json:"-"`
-	User     string         `default:"root"`
-	TTY      bool           `default:"false"`
-	Delete   bool           `default:"true"`
-	Image    string
-	Network  string
-	Registry string			`default:""`
+	Client             *docker.Client `json:"-"`
+	User               string         `default:"root"`
+	TTY                bool           `default:"false"`
+	Delete             bool           `default:"true"`
+	Image              string
+	Network            string
+	Registry           string `default:""`
+	LoggingGelfAddress string `default:"" gcfg:"logging-gelf-address"`
 }
 
 func NewRunServiceJob(c *docker.Client) *RunServiceJob {
@@ -85,6 +85,14 @@ func (j *RunServiceJob) buildService() (*swarm.Service, error) {
 				Target: j.Network,
 			},
 		}
+	}
+
+	if j.LoggingGelfAddress != "" {
+		createSvcOpts.ServiceSpec.TaskTemplate.LogDriver =
+			&swarm.Driver{
+				Name:    "gelf",
+				Options: map[string]string{"gelf-address": j.LoggingGelfAddress},
+			}
 	}
 
 	if j.Command != "" {

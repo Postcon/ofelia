@@ -18,6 +18,7 @@ type Config struct {
 		middlewares.SlackConfig
 		middlewares.SaveConfig
 		middlewares.MailConfig
+		LoggingGelfAddress string `gcfg:"services-logging-gelf-address"`
 	}
 	ExecJobs    map[string]*ExecJobConfig    `gcfg:"job-exec"`
 	RunJobs     map[string]*RunJobConfig     `gcfg:"job-run"`
@@ -84,6 +85,9 @@ func (c *Config) build() (*core.Scheduler, error) {
 
 	for name, j := range c.ServiceJobs {
 		defaults.SetDefaults(j)
+		if j.LoggingGelfAddress == "" {
+			j.LoggingGelfAddress = c.Global.LoggingGelfAddress
+		}
 		j.Name = name
 		j.Client = d
 		j.buildMiddlewares()
