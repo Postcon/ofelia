@@ -46,6 +46,10 @@ func (j *RunServiceJob) Run(ctx *Context) error {
 	ctx.Logger.Noticef("Created service %s for job %s\n", svc.ID, j.ServiceName)
 
 	if err := j.watchContainer(ctx, svc.ID); err != nil {
+		if err2 := j.deleteService(ctx, svc.ID); err2 != nil {
+			ctx.Logger.Errorf("error deleting service %q: %s", fullImageName(j.Registry, j.Image), err2)
+		}
+
 		return err
 	}
 
