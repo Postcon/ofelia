@@ -157,8 +157,7 @@ func (j *RunServiceJob) watchContainer(ctx *Context, svcID string) error {
 	case 0:
 		return nil
 	default:
-		ctx.Logger.Errorf("Service ID %s (%s) error non-zero exit code: %d", svcID, j.Name, exitCode)
-		return nil
+		return fmt.Errorf("exit code: %d", exitCode)
 	}
 }
 
@@ -228,5 +227,4 @@ func (j *RunServiceJob) deleteService(ctx *Context, svcID string) error {
 	}
 
 	return err
-
 }
