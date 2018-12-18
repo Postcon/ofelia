@@ -1,8 +1,10 @@
 ARG ARCH=amd64
 
 FROM golang:1.10.0 AS builder-amd64
+RUN apt-get update && apt-get install -y ca-certificates
 
 FROM arm32v6/golang:1.10.0-alpine AS builder-arm32v6
+RUN apk add --no-cache ca-certificates
 
 FROM builder-${ARCH} AS builder
 
@@ -18,6 +20,7 @@ RUN go build -a -installsuffix cgo -ldflags '-w  -extldflags "-static"' -o /go/b
 FROM scratch
 
 COPY --from=builder /go/bin/ofelia /usr/bin/ofelia
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 VOLUME /etc/ofelia/
 ENTRYPOINT ["/usr/bin/ofelia"]
