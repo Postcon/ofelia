@@ -8,8 +8,8 @@ RUN apk add --no-cache ca-certificates
 
 FROM builder-${ARCH} AS builder
 
-WORKDIR ${GOPATH}/src/github.com/mcuadros/ofelia
-COPY . ${GOPATH}/src/github.com/mcuadros/ofelia
+WORKDIR ${GOPATH}/src/github.com/Postcon/ofelia
+COPY . ${GOPATH}/src/github.com/Postcon/ofelia
 
 ENV CGO_ENABLED 0
 ENV GOOS linux

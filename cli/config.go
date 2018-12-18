@@ -1,9 +1,9 @@
 package cli
 
 import (
+	"github.com/Postcon/ofelia/core"
+	"github.com/Postcon/ofelia/middlewares"
 	"github.com/fsouza/go-dockerclient"
-	"github.com/mcuadros/ofelia/core"
-	"github.com/mcuadros/ofelia/middlewares"
 	"github.com/op/go-logging"
 
 	"github.com/mcuadros/go-defaults"

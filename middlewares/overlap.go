@@ -1,6 +1,6 @@
 package middlewares
 
-import "github.com/mcuadros/ofelia/core"
+import "github.com/Postcon/ofelia/core"
 
 // OverlapConfig configuration for the Overlap middleware
 type OverlapConfig struct {

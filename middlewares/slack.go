@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/mcuadros/ofelia/core"
+	"github.com/Postcon/ofelia/core"
 )
 
 var (

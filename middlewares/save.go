@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/mcuadros/ofelia/core"
+	"github.com/Postcon/ofelia/core"
 )
 
 // SaveConfig configuration for the Save middleware
