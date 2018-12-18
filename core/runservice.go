@@ -21,6 +21,11 @@ type RunServiceJob struct {
 	Network            string
 	Registry           string `default:""`
 	LoggingGelfAddress string `default:"" gcfg:"logging-gelf-address"`
+	ServiceName        string `default:""`
+}
+
+func (j *RunServiceJob) GetName() string {
+	return j.ServiceName
 }
 
 func NewRunServiceJob(c *docker.Client) *RunServiceJob {
@@ -38,7 +43,7 @@ func (j *RunServiceJob) Run(ctx *Context) error {
 		return err
 	}
 
-	ctx.Logger.Noticef("Created service %s for job %s\n", svc.ID, j.Name)
+	ctx.Logger.Noticef("Created service %s for job %s\n", svc.ID, j.ServiceName)
 
 	if err := j.watchContainer(ctx, svc.ID); err != nil {
 		return err
@@ -63,7 +68,9 @@ func (j *RunServiceJob) buildService() (*swarm.Service, error) {
 	max := uint64(1)
 	createSvcOpts := docker.CreateServiceOptions{}
 
-	createSvcOpts.ServiceSpec.Annotations.Name = fmt.Sprintf("%s_%d", j.Name, time.Now().Unix())
+	j.ServiceName = fmt.Sprintf("%s_%d", j.Name, time.Now().Unix())
+
+	createSvcOpts.ServiceSpec.Annotations.Name = j.ServiceName
 
 	createSvcOpts.ServiceSpec.TaskTemplate.ContainerSpec =
 		&swarm.ContainerSpec{
@@ -120,7 +127,7 @@ func (j *RunServiceJob) watchContainer(ctx *Context, svcID string) error {
 
 	exitCode := swarmError
 
-	ctx.Logger.Noticef("Checking for service ID %s (%s) termination\n", svcID, j.Name)
+	ctx.Logger.Noticef("Checking for service ID %s (%s) termination\n", svcID, j.ServiceName)
 
 	svc, err := j.Client.InspectService(svcID)
 	if err != nil {
@@ -151,7 +158,7 @@ func (j *RunServiceJob) watchContainer(ctx *Context, svcID string) error {
 
 	wg.Wait()
 
-	ctx.Logger.Noticef("Service ID %s (%s) has completed\n", svcID, j.Name)
+	ctx.Logger.Noticef("Service ID %s (%s) has completed\n", svcID, j.ServiceName)
 
 	switch exitCode {
 	case 0:
