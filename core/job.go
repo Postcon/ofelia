@@ -6,9 +6,10 @@ import (
 )
 
 type BareJob struct {
-	Schedule string
-	Name     string
-	Command  string
+	Schedule     string
+	Name         string
+	Command      string
+	InstanceName string `default:""`
 
 	middlewareContainer
 	running int32
@@ -18,6 +19,10 @@ type BareJob struct {
 
 func (j *BareJob) GetName() string {
 	return j.Name
+}
+
+func (j *BareJob) GetInstanceName() string {
+	return j.InstanceName
 }
 
 func (j *BareJob) GetSchedule() string {

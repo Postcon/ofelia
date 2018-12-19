@@ -23,6 +23,7 @@ var (
 
 type Job interface {
 	GetName() string
+	GetInstanceName() string
 	GetSchedule() string
 	GetCommand() string
 	Middlewares() []Middleware
@@ -244,7 +245,7 @@ func buildAuthConfiguration(registry string) docker.AuthConfiguration {
 	return auth
 }
 
-func fullImageName(registry string, image string) (string) {
+func fullImageName(registry string, image string) string {
 	if registry == "" {
 		return image
 	}

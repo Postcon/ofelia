@@ -76,14 +76,14 @@ func (m *Slack) buildMessage(ctx *core.Context) *slackMessage {
 	}
 
 	msg.Text = fmt.Sprintf(
-		"Job *%s* finished in *%s*, command _%q_",
+		"Job *%s* finished in *%s*\n```%s```",
 		ctx.Job.GetName(), ctx.Execution.Duration, ctx.Job.GetCommand(),
 	)
 
 	if ctx.Execution.Failed {
 		logsUrl := fmt.Sprintf(
 			"\n<%s|show logs>",
-			strings.Replace(slackLogsUrl, "###service_name###", strings.SplitN(ctx.Job.GetName(), "_", 2)[1], 1),
+			strings.Replace(slackLogsUrl, "###service_name###", strings.SplitN(ctx.Job.GetInstanceName(), "_", 2)[1], 1),
 		)
 
 		msg.Attachments = append(msg.Attachments, slackAttachment{
