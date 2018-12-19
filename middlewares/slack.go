@@ -14,7 +14,7 @@ var (
 	slackUsername   = "Ofelia"
 	slackAvatarURL  = ""
 	slackPayloadVar = "payload"
-	slackLogsUrl    = "http://graylog.postcon.intern:9000/search?rangetype=relative&fields=source%2Cmessage&width=1920&relative=86400&from=&to=&q=service%3A###service_name####?fields=source%2Cmessage%2Cservice"
+	slackLogsUrl    = "http://graylog.postcon.intern:9000/search?rangetype=relative&relative=86400&q=service%3A###instance_name####?fields=source%2Cmessage%2Cservice"
 )
 
 // SlackConfig configuration for the Slack middleware
@@ -83,7 +83,7 @@ func (m *Slack) buildMessage(ctx *core.Context) *slackMessage {
 	if ctx.Execution.Failed {
 		logsUrl := fmt.Sprintf(
 			"\n<%s|show logs>",
-			strings.Replace(slackLogsUrl, "###service_name###", strings.SplitN(ctx.Job.GetInstanceName(), "_", 2)[1], 1),
+			strings.Replace(slackLogsUrl, "###instance_name###", strings.SplitN(ctx.Job.GetInstanceName(), "_", 2)[1], 1),
 		)
 
 		msg.Attachments = append(msg.Attachments, slackAttachment{
