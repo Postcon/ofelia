@@ -3,24 +3,23 @@ package middlewares
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Postcon/ofelia/core"
 	"net/http"
 	"net/url"
 	"strings"
-
-	"github.com/Postcon/ofelia/core"
 )
 
 var (
 	slackUsername   = "Ofelia"
 	slackAvatarURL  = ""
 	slackPayloadVar = "payload"
-	slackLogsUrl    = "http://graylog.postcon.intern:9000/search?rangetype=relative&relative=86400&q=service%3A###instance_name####?fields=source%2Cmessage%2Cservice"
 )
 
 // SlackConfig configuration for the Slack middleware
 type SlackConfig struct {
 	SlackWebhook     string `gcfg:"slack-webhook"`
 	SlackOnlyOnError bool   `gcfg:"slack-only-on-error"`
+	SlackLogsUrl     string `gcfg:"slack-logs-url"`
 }
 
 // NewSlack returns a Slack middleware if the given configuration is not empty
@@ -81,10 +80,14 @@ func (m *Slack) buildMessage(ctx *core.Context) *slackMessage {
 	)
 
 	if ctx.Execution.Failed {
-		logsUrl := fmt.Sprintf(
-			"\n<%s|show logs>",
-			strings.Replace(slackLogsUrl, "###instance_name###", strings.SplitN(ctx.Job.GetInstanceName(), "_", 2)[1], 1),
-		)
+		logsUrl := ""
+
+		if m.SlackLogsUrl != "" {
+			logsUrl = fmt.Sprintf(
+				"\n<%s|show logs>",
+				strings.Replace(m.SlackLogsUrl, "###instance_name###", strings.SplitN(ctx.Job.GetInstanceName(), "_", 2)[1], 1),
+			)
+		}
 
 		msg.Attachments = append(msg.Attachments, slackAttachment{
 			Title: "Execution failed",
