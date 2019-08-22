@@ -54,6 +54,7 @@ image = ubuntu
 network = swarm_network
 command =  touch /tmp/example
 logging-gelf-address = udp://graylog.domain:4711
+placement-constraint = node.role == worker
 ```
 
 ### Logging
@@ -89,6 +90,20 @@ The service defintion has higher prio as the global section
 ```
 [job-service-run "service_1"]
 logging-gelf-address = udp://graylog.domain:4711
+```
+
+#### Service Placement Constraint
+You can set placement constraint for all services (job-service-run) in the `[global]` section:
+```
+[global]
+services-placement-constraint = node.role == worker
+```
+
+Or/And you can set it for every service in his service definition `[job-service-run "service_1"]`.
+The service defintion has higher prio as the global section
+```
+[job-service-run "service_1"]
+placement-constraint = node.role == manager
 ```
 
 ### Overlap

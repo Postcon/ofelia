@@ -18,7 +18,8 @@ type Config struct {
 		middlewares.SlackConfig
 		middlewares.SaveConfig
 		middlewares.MailConfig
-		LoggingGelfAddress string `gcfg:"services-logging-gelf-address"`
+		LoggingGelfAddress  string `gcfg:"services-logging-gelf-address"`
+		PlacementConstraint string `gcfg:"services-placement-constraint"`
 	}
 	ExecJobs    map[string]*ExecJobConfig    `gcfg:"job-exec"`
 	RunJobs     map[string]*RunJobConfig     `gcfg:"job-run"`
@@ -87,6 +88,9 @@ func (c *Config) build() (*core.Scheduler, error) {
 		defaults.SetDefaults(j)
 		if j.LoggingGelfAddress == "" {
 			j.LoggingGelfAddress = c.Global.LoggingGelfAddress
+		}
+		if j.PlacementConstraint == "" {
+			j.PlacementConstraint = c.Global.PlacementConstraint
 		}
 		j.Name = name
 		j.Client = d

@@ -13,14 +13,15 @@ import (
 
 type RunServiceJob struct {
 	BareJob
-	Client             *docker.Client `json:"-"`
-	User               string         `default:"root"`
-	TTY                bool           `default:"false"`
-	Delete             bool           `default:"true"`
-	Image              string
-	Network            string
-	Registry           string `default:""`
-	LoggingGelfAddress string `default:"" gcfg:"logging-gelf-address"`
+	Client              *docker.Client `json:"-"`
+	User                string         `default:"root"`
+	TTY                 bool           `default:"false"`
+	Delete              bool           `default:"true"`
+	Image               string
+	Network             string
+	Registry            string `default:""`
+	LoggingGelfAddress  string `default:"" gcfg:"logging-gelf-address"`
+	PlacementConstraint string `default:"" gcfg:"placement-constraint"`
 }
 
 func NewRunServiceJob(c *docker.Client) *RunServiceJob {
@@ -99,6 +100,10 @@ func (j *RunServiceJob) buildService() (*swarm.Service, error) {
 				Name:    "gelf",
 				Options: map[string]string{"gelf-address": j.LoggingGelfAddress},
 			}
+	}
+
+	if j.PlacementConstraint != "" {
+		createSvcOpts.ServiceSpec.TaskTemplate.Placement.Constraints = []string{j.PlacementConstraint}
 	}
 
 	if j.Command != "" {
