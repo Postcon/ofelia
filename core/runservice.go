@@ -103,7 +103,10 @@ func (j *RunServiceJob) buildService() (*swarm.Service, error) {
 	}
 
 	if j.PlacementConstraint != "" {
-		createSvcOpts.ServiceSpec.TaskTemplate.Placement.Constraints = []string{j.PlacementConstraint}
+		createSvcOpts.ServiceSpec.TaskTemplate.Placement =
+			&swarm.Placement{
+				Constraints: []string{j.PlacementConstraint},
+			}
 	}
 
 	if j.Command != "" {
