@@ -71,24 +71,24 @@ func (s *SuiteRunJob) TestRun(c *C) {
 }
 
 func (s *SuiteRunJob) TestBuildPullImageOptionsBareImage(c *C) {
-	o, _ := buildPullOptions("foo")
+	o, _ := buildPullOptions("foo", "")
 	c.Assert(o.Repository, Equals, "foo")
 	c.Assert(o.Tag, Equals, "latest")
 	c.Assert(o.Registry, Equals, "")
 }
 
 func (s *SuiteRunJob) TestBuildPullImageOptionsVersion(c *C) {
-	o, _ := buildPullOptions("foo:qux")
+	o, _ := buildPullOptions("foo:qux", "")
 	c.Assert(o.Repository, Equals, "foo")
 	c.Assert(o.Tag, Equals, "qux")
 	c.Assert(o.Registry, Equals, "")
 }
 
 func (s *SuiteRunJob) TestBuildPullImageOptionsRegistry(c *C) {
-	o, _ := buildPullOptions("quay.io/srcd/rest:qux")
-	c.Assert(o.Repository, Equals, "quay.io/srcd/rest")
+	o, _ := buildPullOptions("srcd/rest:qux", "docker-registry.company.de:5000")
+	c.Assert(o.Repository, Equals, "docker-registry.company.de:5000/srcd/rest")
 	c.Assert(o.Tag, Equals, "qux")
-	c.Assert(o.Registry, Equals, "quay.io")
+	c.Assert(o.Registry, Equals, "docker-registry.company.de:5000")
 }
 
 func (s *SuiteRunJob) buildImage(c *C) {
@@ -108,7 +108,7 @@ func (s *SuiteRunJob) buildImage(c *C) {
 
 func (s *SuiteRunJob) createNetwork(c *C) {
 	_, err := s.client.CreateNetwork(docker.CreateNetworkOptions{
-		Name: "foo",
+		Name:   "foo",
 		Driver: "bridge",
 	})
 	c.Assert(err, IsNil)
